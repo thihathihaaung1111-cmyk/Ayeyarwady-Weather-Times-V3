@@ -14,175 +14,164 @@
 
 <body>
 
-<!-- Splash -->
-<div id="splash">
-  <h1>🌊 Ayeyarwady Weather Times</h1>
-  <p>Version 3</p>
-</div>
+  <!-- Splash Screen -->
+  <div id="splash">
+    <div class="splash-content">
+      <h1>🌊 Ayeyarwady Weather Times</h1>
+      <p>Version 3</p>
+    </div>
+  </div>
 
-<!-- Header -->
-<header>
+  <!-- Header -->
+  <header class="header">
+    <h1>🌦️ Ayeyarwady Weather</h1>
 
-<h1>🌊 Ayeyarwady Weather</h1>
+    <div class="header-buttons">
+      <button id="themeBtn">🌙</button>
+      <button id="installBtn">📲</button>
+    </div>
+  </header>
 
-<button id="themeBtn">
-🌙
-</button>
+  <!-- Search -->
+  <section class="search-section">
 
-</header>
+    <input
+      type="text"
+      id="searchInput"
+      placeholder="မြို့ / ကျေးရွာ ရှာရန်">
 
-<!-- Search -->
+    <button id="gpsBtn">📍</button>
 
-<section class="search">
+    <div id="searchResult"></div>
 
-<input
-type="text"
-id="searchInput"
-placeholder="မြို့ / ရွာ ရှာရန်">
+  </section>
 
-<button id="gpsBtn">
-📍
-</button>
+  <!-- Current Weather -->
+  <section class="card">
 
-</section>
+    <h2 id="locationName">
+      ပုသိမ်
+    </h2>
 
-<!-- Current Weather -->
+    <h1 id="temperature">
+      --°C
+    </h1>
 
-<section class="card">
+    <p id="weatherText">
+      Loading...
+    </p>
 
-<h2 id="locationName">
-ပုသိမ်
-</h2>
+  </section>
 
-<div id="temperature">
---°C
-</div>
+  <!-- Weather Details -->
+  <section class="card">
 
-<div id="weatherText">
-Loading...
-</div>
+    <div>💧 Humidity : <span id="humidity">--</span></div>
 
-</section>
+    <div>💨 Wind : <span id="wind">--</span></div>
 
-<!-- AI -->
+    <div>🌧️ Rain : <span id="rain">--</span></div>
 
-<section class="card">
+  </section>
 
-<h2>
-🤖 AI Analysis
-</h2>
+  <!-- AI -->
+  <section class="card">
 
-<p id="aiText">
+    <h2>🤖 AI Weather Analysis</h2>
 
-Loading...
+    <p id="aiText">
 
-</p>
+      Loading...
 
-</section>
+    </p>
 
-<!-- Alerts -->
+  </section>
 
-<section class="card">
+  <!-- Alerts -->
+  <section class="card">
 
-<h2>
-⚠ သတိပေးချက်
-</h2>
+    <h2>⚠ Alerts</h2>
 
-<div id="floodAlert">
+    <div id="floodAlert">
+      Flood Loading...
+    </div>
 
-ရေကြီးအခြေအနေ...
+    <div id="cycloneAlert">
+      Cyclone Loading...
+    </div>
 
-</div>
+    <div id="riverAlert">
+      River Loading...
+    </div>
 
-<div id="cycloneAlert">
+  </section>
 
-မုန်တိုင်းအခြေအနေ...
+  <!-- Forecast -->
+  <section class="card">
 
-</div>
+    <h2>📅 7 Day Forecast</h2>
 
-</section>
+    <div id="forecast"></div>
 
-<!-- Forecast -->
+  </section>
 
-<section class="card">
+  <!-- River -->
+  <section class="card">
 
-<h2>
+    <h2>🌊 River & Tide</h2>
 
-📅 ၇ ရက်စာ
+    <div id="riverInfo">
 
-</h2>
+      Loading...
 
-<div id="forecast">
+    </div>
 
-</div>
+  </section>
 
-</section>
+  <!-- Water Transport -->
+  <section class="card">
 
-<!-- River -->
+    <h2>🚤 Water Transport</h2>
 
-<section class="card">
+    <div id="transportInfo">
 
-<h2>
+      Loading...
 
-🌊 River & Tide
+    </div>
 
-</h2>
+  </section>
 
-<div id="riverInfo">
+  <!-- Articles -->
+  <section class="card">
 
-Loading...
+    <h2>📰 Articles</h2>
 
-</div>
+    <div id="articleList">
 
-</section>
+      Loading...
 
-<!-- Water Transport -->
+    </div>
 
-<section class="card">
+  </section>
 
-<h2>
+  <!-- Footer -->
+  <footer>
 
-🚤 Water Transport
+    © 2026 Ayeyarwady Weather Times
 
-</h2>
+  </footer>
 
-<div id="transportInfo">
+  <!-- JavaScript -->
 
-Loading...
+  <script src="theme.js"></script>
 
-</div>
+  <script src="gps.js"></script>
 
-</section>
+  <script src="search.js"></script>
 
-<!-- Articles -->
+  <script src="api.js"></script>
 
-<section class="card">
-
-<h2>
-
-🌾 Articles
-
-</h2>
-
-<div id="articleList">
-
-Loading...
-
-</div>
-
-</section>
-
-<footer>
-
-<p>
-
-© Ayeyarwady Weather Times V3
-
-</p>
-
-</footer>
-
-<script src="script.js"></script>
+  <script src="script.js"></script>
 
 </body>
-  </html>
+                                                     </html>

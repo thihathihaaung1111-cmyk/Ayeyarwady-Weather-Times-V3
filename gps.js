@@ -1,86 +1,133 @@
-// =====================================
+// ======================================
 // Ayeyarwady Weather Times V3
 // gps.js
-// =====================================
+// ======================================
+
+"use strict";
+
+
+// ======================================
+// GPS Variables
+// ======================================
+
+let gpsWatcher = null;
+
+
+// ======================================
+// Initialize GPS
+// ======================================
 
 function initGPS() {
 
-    const gpsBtn = document.getElementById("gpsBtn");
-
-    if (!gpsBtn) return;
-
-    gpsBtn.addEventListener("click", getCurrentLocation);
-
-}
-
-// Get current location
-function getCurrentLocation() {
-
     if (!navigator.geolocation) {
 
-        alert("❌ သင့် Browser မှာ GPS မရနိုင်ပါ။");
+        console.error("GPS Not Supported");
+
         return;
 
     }
 
-    gpsBtnLoading(true);
+    getCurrentLocation();
+
+}
+
+
+// ======================================
+// Get Current Location
+// ======================================
+
+function getCurrentLocation() {
 
     navigator.geolocation.getCurrentPosition(
 
-        position => {
+        onLocationSuccess,
 
-            const lat = position.coords.latitude;
-            const lon = position.coords.longitude;
-
-            console.log("Latitude :", lat);
-            console.log("Longitude:", lon);
-
-            gpsBtnLoading(false);
-
-            // နောက်ပိုင်း api.js ထဲက Weather API ကို ခေါ်မယ်
-            if (typeof getWeatherByLocation === "function") {
-                getWeatherByLocation(lat, lon);
-            }
-
-        },
-
-        error => {
-
-            gpsBtnLoading(false);
-
-            alert("📍 Location Permission ပေးပြီး ထပ်စမ်းကြည့်ပါ။");
-
-            console.error(error);
-
-        },
+        onLocationError,
 
         {
+
             enableHighAccuracy: true,
+
             timeout: 10000,
-            maximumAge: 0
+
+            maximumAge: 300000
+
         }
 
     );
 
 }
 
-// GPS Button Loading
-function gpsBtnLoading(status) {
 
-    const btn = document.getElementById("gpsBtn");
+// ======================================
+// Location Success
+// ======================================
 
-    if (!btn) return;
+function onLocationSuccess(position) {
 
-    if (status) {
+    APP.currentLocation = {
 
-        btn.disabled = true;
-        btn.textContent = "⏳";
+        latitude: position.coords.latitude,
 
-    } else {
+        longitude: position.coords.longitude,
 
-        btn.disabled = false;
-        btn.textContent = "📍";
+        accuracy: position.coords.accuracy
+
+    };
+
+    console.log(APP.currentLocation);
+
+    refreshAll();
+
+}
+
+
+// ======================================
+// Location Error
+// ======================================
+
+function onLocationError(error) {
+
+    console.error(error);
+
+}
+
+
+// ======================================
+// Watch Location
+// ======================================
+
+function startLocationWatcher() {
+
+    gpsWatcher = navigator.geolocation.watchPosition(
+
+        onLocationSuccess,
+
+        onLocationError,
+
+        {
+
+            enableHighAccuracy: true,
+
+            maximumAge: 300000
+
+        }
+
+    );
+
+}
+
+
+// ======================================
+// Stop Watcher
+// ======================================
+
+function stopLocationWatcher() {
+
+    if (gpsWatcher !== null) {
+
+        navigator.geolocation.clearWatch(gpsWatcher);
 
     }
 
-      }
+        }

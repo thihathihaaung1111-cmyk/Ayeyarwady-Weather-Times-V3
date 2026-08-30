@@ -17,7 +17,7 @@ async function getWeatherByLocation(lat, lon) {
 
         const data = await response.json();
 
-        updateWeather(data);
+        renderWeather(data);
 
     } catch (error) {
 

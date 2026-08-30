@@ -3,61 +3,141 @@
 // river.js
 // ======================================
 
-// River Information
+"use strict";
+
+
+// ======================================
+// River Variables
+// ======================================
+
 let riverData = null;
 
-// Initialize
+
+// ======================================
+// Initialize River
+// ======================================
+
 function initRiver() {
 
-    loadRiverData();
+    console.log("River Module Ready");
 
 }
 
-// Load River Data
-async function loadRiverData() {
+
+// ======================================
+// Load River
+// ======================================
+
+async function loadRiver() {
 
     try {
 
-        // နောက်ပိုင်း river.json သို့မဟုတ် API ဖြင့် အစားထိုးမယ်
+        if (!APP.currentLocation) {
 
-        riverData = {
-            station: "Pathein",
-            river: "Ayeyarwady River",
-            level: "--",
-            danger: "--",
-            trend: "unknown",
-            update: "--"
-        };
+            console.warn("Location Not Found");
 
-        updateRiverUI();
+            return;
+
+        }
+
+        // TODO:
+        // River API
 
     } catch (error) {
 
-        console.error("River Error:", error);
+        console.error(error);
 
     }
 
 }
 
-// Update UI
-function updateRiverUI() {
 
-    const riverInfo = document.getElementById("riverInfo");
+// ======================================
+// Render River
+// ======================================
 
-    if (!riverInfo) return;
+function renderRiver(data) {
 
-    riverInfo.innerHTML = `
-        <h3>🌊 ${riverData.river}</h3>
+    riverData = data;
 
-        <p>📍 Station : ${riverData.station}</p>
+    updateRiver(data);
 
-        <p>📏 Water Level : ${riverData.level}</p>
+}
 
-        <p>⚠ Danger Level : ${riverData.danger}</p>
 
-        <p>📈 Trend : ${riverData.trend}</p>
+// ======================================
+// Update River
+// ======================================
 
-        <small>Updated : ${riverData.update}</small>
-    `;
+function updateRiver(data) {
 
-                      }
+    const level = document.getElementById("riverLevel");
+
+    const status = document.getElementById("riverStatus");
+
+    if (!level || !status) return;
+
+    level.textContent = data.level + " m";
+
+    status.textContent = getRiverStatus(data.level);
+
+    status.className = getRiverClass(data.level);
+
+}
+
+
+// ======================================
+// Refresh River
+// ======================================
+
+async function refreshRiver() {
+
+    await loadRiver();
+
+}
+
+
+// ======================================
+// River Status
+// ======================================
+
+function getRiverStatus(level) {
+
+    if (level >= 12) {
+
+        return "အန္တရာယ်";
+
+    }
+
+    if (level >= 10) {
+
+        return "သတိပေး";
+
+    }
+
+    return "ပုံမှန်";
+
+}
+
+
+// ======================================
+// River Class
+// ======================================
+
+function getRiverClass(level) {
+
+    if (level >= 12) {
+
+        return "danger";
+
+    }
+
+    if (level >= 10) {
+
+        return "warning";
+
+    }
+
+    return "normal";
+
+    }

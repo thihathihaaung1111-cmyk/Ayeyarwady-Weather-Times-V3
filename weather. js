@@ -1,0 +1,72 @@
+// ======================================
+// Ayeyarwady Weather Times V3
+// weather.js
+// ======================================
+
+"use strict";
+
+
+// ======================================
+// Initialize Weather
+// ======================================
+
+function initWeather() {
+
+    console.log("Weather Module Ready");
+
+}
+
+
+// ======================================
+// Load Weather
+// ======================================
+
+async function loadWeather() {
+
+    try {
+
+        if (!APP.currentLocation) {
+
+            console.warn("Location Not Found");
+
+            return;
+
+        }
+
+        await getWeatherByLocation(
+
+            APP.currentLocation.latitude,
+
+            APP.currentLocation.longitude
+
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+    }
+
+}
+
+
+// ======================================
+// Render Weather
+// ======================================
+
+function renderWeather(data) {
+
+    updateWeather(data);
+
+}
+
+
+// ======================================
+// Refresh Weather
+// ======================================
+
+async function refreshWeather() {
+
+    await loadWeather();
+
+}

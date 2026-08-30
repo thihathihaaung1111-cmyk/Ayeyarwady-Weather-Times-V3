@@ -3,89 +3,126 @@
 // cyclone.js
 // ======================================
 
+"use strict";
+
+
+// ======================================
+// Cyclone Variables
+// ======================================
+
 let cycloneData = null;
 
-// Initialize
+
+// ======================================
+// Initialize Cyclone
+// ======================================
+
 function initCyclone() {
 
-    loadCycloneData();
+    console.log("Cyclone Module Ready");
 
 }
 
-// Load Cyclone Data
-async function loadCycloneData() {
+
+// ======================================
+// Load Cyclone
+// ======================================
+
+async function loadCyclone() {
 
     try {
 
-        // နောက်ပိုင်း API / JSON နဲ့ အစားထိုးမယ်
+        if (!APP.currentLocation) {
 
-        cycloneData = {
+            console.warn("Location Not Found");
 
-            status: "No Active Cyclone",
+            return;
 
-            name: "--",
+        }
 
-            category: "--",
-
-            wind_speed: "--",
-
-            wind_direction: "--",
-
-            pressure: "--",
-
-            wave_height: "--",
-
-            monsoon: "--",
-
-            sea_condition: "--",
-
-            advice: "Weather is normal."
-
-        };
-
-        updateCycloneUI();
+        // TODO:
+        // Load Cyclone API
 
     } catch (error) {
 
-        console.error("Cyclone Error :", error);
+        console.error(error);
 
     }
 
 }
 
-// Update UI
-function updateCycloneUI() {
 
-    const cycloneInfo = document.getElementById("cycloneInfo");
+// ======================================
+// Render Cyclone
+// ======================================
 
-    if (!cycloneInfo) return;
+function renderCyclone(data) {
 
-    cycloneInfo.innerHTML = `
+    cycloneData = data;
 
-        <p>🌀 Status : ${cycloneData.status}</p>
+    updateCyclone(data);
 
-        <p>📛 Name : ${cycloneData.name}</p>
+}
 
-        <p>🌪 Category : ${cycloneData.category}</p>
 
-        <p>💨 Wind : ${cycloneData.wind_speed}</p>
+// ======================================
+// Update Cyclone
+// ======================================
 
-        <p>🧭 Direction : ${cycloneData.wind_direction}</p>
+function updateCyclone(data) {
 
-        <p>🌡 Pressure : ${cycloneData.pressure}</p>
+    const status = document.getElementById("cycloneStatus");
 
-        <p>🌊 Wave Height : ${cycloneData.wave_height}</p>
+    const wind = document.getElementById("windSpeed");
 
-        <p>🌧 Monsoon : ${cycloneData.monsoon}</p>
+    const wave = document.getElementById("waveHeight");
 
-        <p>🚢 Sea : ${cycloneData.sea_condition}</p>
+    if (!status || !wind || !wave) return;
 
-        <hr>
+    status.textContent = getCycloneStatus(data.level);
 
-        <p><strong>⚠ Advice</strong></p>
+    wind.textContent = data.wind + " km/h";
 
-        <p>${cycloneData.advice}</p>
+    wave.textContent = data.wave + " m";
 
-    `;
+}
 
-      }
+
+// ======================================
+// Refresh Cyclone
+// ======================================
+
+async function refreshCyclone() {
+
+    await loadCyclone();
+
+}
+
+
+// ======================================
+// Cyclone Status
+// ======================================
+
+function getCycloneStatus(level) {
+
+    switch (level) {
+
+        case 1:
+
+            return "စောင့်ကြည့်";
+
+        case 2:
+
+            return "သတိပေး";
+
+        case 3:
+
+            return "အန္တရာယ်";
+
+        default:
+
+            return "ပုံမှန်";
+
+    }
+
+}

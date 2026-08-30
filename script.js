@@ -1,69 +1,77 @@
-// ===================================================
+// ======================================
 // Ayeyarwady Weather Times V3
-// Main Script
-// ===================================================
+// Main Controller
+// script.js
+// ======================================
 
-let locations = [];
-let selectedLocation = null;
+"use strict";
 
-// ------------------------------
+
+// ======================================
+// Global Variables
+// ======================================
+
+const APP = {
+
+    version: "3.0.0",
+
+    name: "Ayeyarwady Weather Times",
+
+    initialized: false,
+
+    online: navigator.onLine,
+
+    currentLocation: null,
+
+    lastUpdate: null
+
+};
+
+
+// ======================================
 // App Start
-// ------------------------------
-window.addEventListener("DOMContentLoaded", async () => {
+// ======================================
 
-    showSplash();
+document.addEventListener(
 
-    await loadLocations();
+    "DOMContentLoaded",
 
-    setupTheme();
+    () => {
 
-    setupSearch();
+        startApp();
 
-    setupGPS();
+    }
 
-});
+);
 
-// ------------------------------
-// Splash Screen
-// ------------------------------
-function showSplash(){
 
-    setTimeout(()=>{
+// ======================================
+// Start App
+// ======================================
 
-        const splash=document.getElementById("splash");
+async function startApp() {
 
-        splash.style.opacity="0";
+    try {
 
-        setTimeout(()=>{
+        showLoading();
 
-            splash.style.display="none";
+        await initModules();
 
-        },500);
+        setupEvents();
 
-    },1000);
+        startClock();
 
-}
+        startAutoRefresh();
 
-// ------------------------------
-// Load locations.json
-// ------------------------------
-async function loadLocations(){
+        updateNetworkStatus();
 
-    try{
+        APP.initialized = true;
 
-        const response=await fetch("locations.json");
+        hideLoading();
 
-        locations=await response.json();
+        console.log("App Ready");
 
-        if(locations.length){
-
-            selectedLocation=locations[0];
-
-            updateLocationName();
-
-        }
-
-    }catch(error){
+    } catch (error) {
 
         console.error(error);
 
@@ -71,96 +79,352 @@ async function loadLocations(){
 
 }
 
-// ------------------------------
-// Update Location
-// ------------------------------
-function updateLocationName(){
 
-    if(!selectedLocation) return;
+// ======================================
+// Initialize Modules
+// ======================================
 
-    document.getElementById("locationName").textContent =
-        selectedLocation.village_mm || selectedLocation.village_en;
+async function initModules() {
+
+    initSettings();
+
+    initTheme();
+
+    initNotifications();
+
+    initGPS();
+
+    initSearch();
+
+    initWeather();
+
+    initForecast();
+
+    initRiver();
+
+    initTide();
+
+    initCyclone();
+
+    initAlert();
+
+    initArticles();
+
+    initTransport();
+
+    initProducts();
+
+    initShops();
+
+    initNews();
+
+    initAgriculture();
+
+    initAI();
 
 }
 
-// ------------------------------
-// Search
-// ------------------------------
-function setupSearch(){
 
-    const input=document.getElementById("searchInput");
+// ======================================
+// Event System
+// ======================================
 
-    input.addEventListener("input",()=>{
+function setupEvents() {
 
-        const keyword=input.value.toLowerCase();
+    window.addEventListener(
 
-        const result=locations.find(item=>{
+        "online",
 
-            return(
-                item.village_mm?.includes(keyword) ||
-                item.village_en?.toLowerCase().includes(keyword) ||
-                item.township_mm?.includes(keyword) ||
-                item.township_en?.toLowerCase().includes(keyword)
-            );
+        handleOnline
 
-        });
+    );
 
-        if(result){
+    window.addEventListener(
 
-            selectedLocation=result;
+        "offline",
 
-            updateLocationName();
+        handleOffline
+
+    );
+
+    document.addEventListener(
+
+        "visibilitychange",
+
+        handleVisibility
+
+    );
+
+    const refreshBtn = document.getElementById(
+
+        "refreshBtn"
+
+    );
+
+    if (refreshBtn) {
+
+        refreshBtn.addEventListener(
+
+            "click",
+
+            refreshAll
+
+        );
+
+    }
+
+}
+
+
+// ======================================
+// Online
+// ======================================
+
+function handleOnline() {
+
+    APP.online = true;
+
+    updateNetworkStatus();
+
+    console.log("Internet Connected");
+
+    refreshAll();
+
+}
+
+
+// ======================================
+// Offline
+// ======================================
+
+function handleOffline() {
+
+    APP.online = false;
+
+    updateNetworkStatus();
+
+    console.log("Internet Disconnected");
+
+}
+
+
+// ======================================
+// Visibility
+// ======================================
+
+function handleVisibility() {
+
+    if (
+
+        document.visibilityState === "visible"
+
+    ) {
+
+        refreshAll();
+
+    }
+
+}
+
+
+// ======================================
+// Refresh All
+// ======================================
+
+async function refreshAll() {
+
+    try {
+
+        showLoading();
+
+        APP.lastUpdate = new Date();
+
+        if (APP.online) {
+
+            await loadWeather();
+
+            await loadForecast();
+
+            await loadRiver();
+
+            await loadTide();
+
+            await loadCyclone();
+
+            await loadAlerts();
+
+            await loadArticles();
+
+            await loadTransport();
+
+            await loadProducts();
+
+            await loadShops();
+
+            await loadNews();
+
+            await loadAgriculture();
 
         }
 
-    });
+        initAI();
+
+        updateLastUpdate();
+
+        hideLoading();
+
+        console.log("Refresh Complete");
+
+    } catch (error) {
+
+        console.error(error);
+
+        hideLoading();
+
+    }
 
 }
 
-// ------------------------------
-// GPS
-// ------------------------------
-function setupGPS(){
 
-    document.getElementById("gpsBtn")
-    .addEventListener("click",()=>{
+// ======================================
+// Last Update
+// ======================================
 
-        if(!navigator.geolocation){
+function updateLastUpdate() {
 
-            alert("GPS မရပါ");
+    const element = document.getElementById(
 
-            return;
+        "lastUpdate"
+
+    );
+
+    if (!element) return;
+
+    element.textContent =
+
+        APP.lastUpdate.toLocaleString();
+
+}
+
+
+// ======================================
+// Show Loading
+// ======================================
+
+function showLoading() {
+
+    const loading = document.getElementById(
+
+        "loading"
+
+    );
+
+    if (loading) {
+
+        loading.style.display = "flex";
+
+    }
+
+}
+
+
+// ======================================
+// Hide Loading
+// ======================================
+
+function hideLoading() {
+
+    const loading = document.getElementById(
+
+        "loading"
+
+    );
+
+    if (loading) {
+
+        loading.style.display = "none";
+
+    }
+
+}
+
+// ======================================
+// Auto Refresh
+// ======================================
+
+function startAutoRefresh() {
+
+    // 10 Minutes
+
+    setInterval(() => {
+
+        if (APP.online) {
+
+            refreshAll();
 
         }
 
-        navigator.geolocation.getCurrentPosition(position=>{
-
-            console.log(position.coords);
-
-            alert("GPS ရရှိပါပြီ။ Weather API ကို နောက်အဆင့်မှာ ချိတ်မယ်။");
-
-        });
-
-    });
+    }, 600000);
 
 }
 
-// ------------------------------
-// Theme
-// ------------------------------
-function setupTheme(){
 
-    const btn=document.getElementById("themeBtn");
+// ======================================
+// Clock
+// ======================================
 
-    btn.onclick=()=>{
+function startClock() {
 
-        document.body.classList.toggle("dark");
+    updateClock();
 
-        btn.textContent=
-            document.body.classList.contains("dark")
-            ? "☀️"
-            : "🌙";
+    setInterval(updateClock, 1000);
 
-    };
+}
 
-          }
+
+function updateClock() {
+
+    const clock = document.getElementById(
+
+        "clock"
+
+    );
+
+    if (!clock) return;
+
+    const now = new Date();
+
+    clock.textContent = now.toLocaleTimeString(
+
+        "en-GB"
+
+    );
+
+}
+
+
+// ======================================
+// Network Status
+// ======================================
+
+function updateNetworkStatus() {
+
+    const network = document.getElementById(
+
+        "networkStatus"
+
+    );
+
+    if (!network) return;
+
+    if (APP.online) {
+
+        network.textContent = "🟢 Online";
+
+    } else {
+
+        network.textContent = "🔴 Offline";
+
+    }
+
+}

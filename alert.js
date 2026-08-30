@@ -3,70 +3,149 @@
 // alert.js
 // ======================================
 
-let alertData = [];
+"use strict";
 
+
+// ======================================
+// Alert Variables
+// ======================================
+
+let alertList = [];
+
+
+// ======================================
 // Initialize Alert
+// ======================================
+
 function initAlert() {
 
-    loadAlerts();
+    alertList = [];
+
+    console.log("Alert Module Ready");
 
 }
 
-// Load Alert Data
+
+// ======================================
+// Load Alerts
+// ======================================
+
 async function loadAlerts() {
 
-    try {
+    alertList = [];
 
-        // နောက်ပိုင်း DMH API / JSON ဖြင့် အစားထိုးမယ်
+    checkWeatherAlert();
 
-        alertData = [
+    checkRiverAlert();
 
-            {
-                type: "weather",
-                level: "Normal",
-                title: "ရာသီဥတုပုံမှန်",
-                message: "လက်ရှိတွင် အထူးသတိပေးချက် မရှိသေးပါ။"
-            }
+    checkTideAlert();
 
-        ];
+    checkCycloneAlert();
 
-        updateAlertUI();
+    renderAlerts();
 
-    } catch (error) {
+}
 
-        console.error("Alert Error :", error);
+
+// ======================================
+// Render Alerts
+// ======================================
+
+function renderAlerts() {
+
+    const container = document.getElementById("alertList");
+
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    if (alertList.length === 0) {
+
+        container.innerHTML = `
+            <div class="alert-normal">
+                ✅ လက်ရှိတွင် အရေးပေါ်သတိပေးချက် မရှိပါ။
+            </div>
+        `;
+
+        return;
 
     }
 
-}
+    alertList.forEach(alert => {
 
-// Update UI
-function updateAlertUI() {
+        const item = document.createElement("div");
 
-    const alertBox = document.getElementById("alertBox");
+        item.className = "alert-item";
 
-    if (!alertBox) return;
-
-    alertBox.innerHTML = "";
-
-    alertData.forEach(alert => {
-
-        const card = document.createElement("div");
-
-        card.className = "alert-card " + alert.level.toLowerCase();
-
-        card.innerHTML = `
-
-            <h3>${alert.title}</h3>
-
-            <p>${alert.message}</p>
-
-            <small>Level : ${alert.level}</small>
-
+        item.innerHTML = `
+            <div class="alert-icon">⚠️</div>
+            <div class="alert-text">${alert}</div>
         `;
 
-        alertBox.appendChild(card);
+        container.appendChild(item);
 
     });
+
+}
+
+
+// ======================================
+// Weather Alert
+// ======================================
+
+function checkWeatherAlert() {
+
+    // TODO:
+    // Heavy Rain
+    // Thunderstorm
+    // Strong Wind
+
+}
+
+
+// ======================================
+// River Alert
+// ======================================
+
+function checkRiverAlert() {
+
+    // TODO:
+    // River Rising
+    // Flood Warning
+
+}
+
+
+// ======================================
+// Tide Alert
+// ======================================
+
+function checkTideAlert() {
+
+    // TODO:
+    // High Tide
+
+}
+
+
+// ======================================
+// Cyclone Alert
+// ======================================
+
+function checkCycloneAlert() {
+
+    // TODO:
+    // Cyclone Warning
+
+}
+
+
+// ======================================
+// Add Alert
+// ======================================
+
+function addAlert(message) {
+
+    alertList.push(message);
 
 }

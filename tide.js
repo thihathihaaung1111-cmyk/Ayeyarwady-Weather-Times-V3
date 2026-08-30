@@ -3,60 +3,122 @@
 // tide.js
 // ======================================
 
+"use strict";
+
+
+// ======================================
+// Tide Variables
+// ======================================
+
 let tideData = null;
 
+
+// ======================================
 // Initialize Tide
+// ======================================
+
 function initTide() {
 
-    loadTideData();
+    console.log("Tide Module Ready");
 
 }
 
-// Load Tide Data
-async function loadTideData() {
+
+// ======================================
+// Load Tide
+// ======================================
+
+async function loadTide() {
 
     try {
 
-        // နောက်ပိုင်း API / JSON ဖြင့် အစားထိုးမယ်
+        if (!APP.currentLocation) {
 
-        tideData = {
-            station: "Pathein",
-            high_tide: "--:--",
-            low_tide: "--:--",
-            next: "--",
-            height: "--",
-            moon: "--"
-        };
+            console.warn("Location Not Found");
 
-        updateTideUI();
+            return;
+
+        }
+
+        // TODO:
+        // Load Tide API
 
     } catch (error) {
 
-        console.error("Tide Error :", error);
+        console.error(error);
 
     }
 
 }
 
-// Update Tide UI
-function updateTideUI() {
 
-    const tideInfo = document.getElementById("tideInfo");
+// ======================================
+// Render Tide
+// ======================================
 
-    if (!tideInfo) return;
+function renderTide(data) {
 
-    tideInfo.innerHTML = `
-        <h3>🌊 ${tideData.station}</h3>
+    tideData = data;
 
-        <p>⬆️ High Tide : ${tideData.high_tide}</p>
+    updateTide(data);
 
-        <p>⬇️ Low Tide : ${tideData.low_tide}</p>
+}
 
-        <p>⏰ Next Tide : ${tideData.next}</p>
 
-        <p>📏 Tide Height : ${tideData.height}</p>
+// ======================================
+// Update Tide
+// ======================================
 
-        <p>🌙 Moon Phase : ${tideData.moon}</p>
-    `;
+function updateTide(data) {
 
-                }
+    const level = document.getElementById("tideLevel");
+
+    const status = document.getElementById("tideStatus");
+
+    const next = document.getElementById("nextTide");
+
+    if (!level || !status || !next) return;
+
+    level.textContent = data.level + " m";
+
+    status.textContent = getTideStatus(data.type);
+
+    next.textContent = data.next;
+
+}
+
+
+// ======================================
+// Refresh Tide
+// ======================================
+
+async function refreshTide() {
+
+    await loadTide();
+
+}
+
+
+// ======================================
+// Tide Status
+// ======================================
+
+function getTideStatus(type) {
+
+    switch (type) {
+
+        case "HIGH":
+
+            return "ဒီရေတက်";
+
+        case "LOW":
+
+            return "ဒီရေကျ";
+
+        default:
+
+            return "မသိ";
+
+    }
+
+        }

@@ -111,8 +111,6 @@ function applySettings() {
 
     applyTheme();
 
-    applyLanguage();
-
 }
 
 

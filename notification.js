@@ -3,58 +3,77 @@
 // notification.js
 // ======================================
 
-let notificationPermission = false;
+"use strict";
 
-// Initialize
+
+// ======================================
+// Notification Variables
+// ======================================
+
+let notificationPermission = "default";
+
+
+// ======================================
+// Initialize Notification
+// ======================================
+
 async function initNotifications() {
 
     if (!("Notification" in window)) {
 
-        console.log("Notification is not supported.");
+        console.warn("Notification Not Supported");
 
         return;
 
     }
 
-    if (Notification.permission === "granted") {
+    notificationPermission = Notification.permission;
 
-        notificationPermission = true;
+    if (notificationPermission === "default") {
 
-    } else if (Notification.permission !== "denied") {
-
-        const permission = await Notification.requestPermission();
-
-        notificationPermission = permission === "granted";
+        notificationPermission = await Notification.requestPermission();
 
     }
 
+    console.log("Notification:", notificationPermission);
+
 }
 
-// Show Notification
-function showNotification(title, message, icon = "icons/icon-192.png") {
 
-    if (!notificationPermission) return;
+// ======================================
+// Show Notification
+// ======================================
+
+function showNotification(title, message) {
+
+    if (notificationPermission !== "granted") {
+
+        return;
+
+    }
 
     new Notification(title, {
 
         body: message,
 
-        icon: icon,
+        icon: "assets/icons/icon-192.png",
 
-        badge: icon,
-
-        silent: false
+        badge: "assets/icons/icon-192.png"
 
     });
 
 }
 
-// Weather Alert
+
+// ======================================
+// Weather Notification
+// ======================================
+
 function notifyWeather(message) {
 
     showNotification(
 
-        "🌦 Weather Alert",
+        "🌦️ Weather Alert",
 
         message
 
@@ -62,12 +81,50 @@ function notifyWeather(message) {
 
 }
 
-// Cyclone Alert
+
+// ======================================
+// River Notification
+// ======================================
+
+function notifyRiver(message) {
+
+    showNotification(
+
+        "🌊 River Alert",
+
+        message
+
+    );
+
+}
+
+
+// ======================================
+// Tide Notification
+// ======================================
+
+function notifyTide(message) {
+
+    showNotification(
+
+        "🌙 Tide Alert",
+
+        message
+
+    );
+
+}
+
+
+// ======================================
+// Cyclone Notification
+// ======================================
+
 function notifyCyclone(message) {
 
     showNotification(
 
-        "🌀 Cyclone Warning",
+        "🌀 Cyclone Alert",
 
         message
 
@@ -75,38 +132,16 @@ function notifyCyclone(message) {
 
 }
 
-// Flood Alert
-function notifyFlood(message) {
+
+// ======================================
+// Emergency Notification
+// ======================================
+
+function notifyEmergency(message) {
 
     showNotification(
 
-        "🌊 Flood Warning",
-
-        message
-
-    );
-
-}
-
-// Transport Alert
-function notifyTransport(message) {
-
-    showNotification(
-
-        "🚤 Transport Notice",
-
-        message
-
-    );
-
-}
-
-// News Alert
-function notifyNews(message) {
-
-    showNotification(
-
-        "📰 News Update",
+        "🚨 Emergency Warning",
 
         message
 

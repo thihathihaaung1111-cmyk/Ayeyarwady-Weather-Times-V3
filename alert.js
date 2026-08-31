@@ -1,30 +1,20 @@
 // ======================================
-// Ayeyarwady Weather Times V3
 // alert.js
 // ======================================
 
 "use strict";
 
+let alertData = null;
 
 // ======================================
-// Alert Variables
-// ======================================
-
-let alertList = [];
-
-
-// ======================================
-// Initialize Alert
+// Initialize
 // ======================================
 
 function initAlert() {
 
-    alertList = [];
-
-    console.log("Alert Module Ready");
+    loadAlerts();
 
 }
-
 
 // ======================================
 // Load Alerts
@@ -32,20 +22,50 @@ function initAlert() {
 
 async function loadAlerts() {
 
-    alertList = [];
+    try {
 
-    checkWeatherAlert();
+        // TODO:
+        // Google Sheet / API နဲ့ ချိတ်မယ်
 
-    checkRiverAlert();
+        alertData = {
 
-    checkTideAlert();
+            flood: {
 
-    checkCycloneAlert();
+                level: "Normal",
 
-    renderAlerts();
+                message: "ရေကြီးနိုင်မှု မရှိသေးပါ"
+
+            },
+
+            cyclone: {
+
+                level: "None",
+
+                message: "မုန်တိုင်းသတိပေးချက် မရှိပါ"
+
+            },
+
+            river: {
+
+                level: "Safe",
+
+                message: "မြစ်ရေ အခြေအနေ ပုံမှန်"
+
+            }
+
+        };
+
+        renderAlerts();
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+    }
 
 }
-
 
 // ======================================
 // Render Alerts
@@ -53,99 +73,36 @@ async function loadAlerts() {
 
 function renderAlerts() {
 
-    const container = document.getElementById("alertList");
+    if (!alertData) return;
 
-    if (!container) return;
+    const flood =
+        document.getElementById("floodAlert");
 
-    container.innerHTML = "";
+    const cyclone =
+        document.getElementById("cycloneAlert");
 
-    if (alertList.length === 0) {
+    const river =
+        document.getElementById("riverAlert");
 
-        container.innerHTML = `
-            <div class="alert-normal">
-                ✅ လက်ရှိတွင် အရေးပေါ်သတိပေးချက် မရှိပါ။
-            </div>
-        `;
+    if (flood) {
 
-        return;
+        flood.innerHTML =
+        `🌊 <strong>${alertData.flood.level}</strong><br>${alertData.flood.message}`;
 
     }
 
-    alertList.forEach(alert => {
+    if (cyclone) {
 
-        const item = document.createElement("div");
+        cyclone.innerHTML =
+        `🌀 <strong>${alertData.cyclone.level}</strong><br>${alertData.cyclone.message}`;
 
-        item.className = "alert-item";
+    }
 
-        item.innerHTML = `
-            <div class="alert-icon">⚠️</div>
-            <div class="alert-text">${alert}</div>
-        `;
+    if (river) {
 
-        container.appendChild(item);
+        river.innerHTML =
+        `🚩 <strong>${alertData.river.level}</strong><br>${alertData.river.message}`;
 
-    });
+    }
 
-}
-
-
-// ======================================
-// Weather Alert
-// ======================================
-
-function checkWeatherAlert() {
-
-    // TODO:
-    // Heavy Rain
-    // Thunderstorm
-    // Strong Wind
-
-}
-
-
-// ======================================
-// River Alert
-// ======================================
-
-function checkRiverAlert() {
-
-    // TODO:
-    // River Rising
-    // Flood Warning
-
-}
-
-
-// ======================================
-// Tide Alert
-// ======================================
-
-function checkTideAlert() {
-
-    // TODO:
-    // High Tide
-
-}
-
-
-// ======================================
-// Cyclone Alert
-// ======================================
-
-function checkCycloneAlert() {
-
-    // TODO:
-    // Cyclone Warning
-
-}
-
-
-// ======================================
-// Add Alert
-// ======================================
-
-function addAlert(message) {
-
-    alertList.push(message);
-
-}
+                                }

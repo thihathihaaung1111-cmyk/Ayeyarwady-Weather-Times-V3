@@ -1,102 +1,196 @@
-// =====================================
+// ======================================
 // Ayeyarwady Weather Times V3
 // search.js
-// =====================================
+// ======================================
+
+"use strict";
+
+
+// ======================================
+// Search Variables
+// ======================================
 
 let locations = [];
+
 let filteredLocations = [];
 
-// Load locations.json
+
+// ======================================
+// Initialize Search
+// ======================================
+
+async function initSearch() {
+
+    await loadLocations();
+
+    setupSearch();
+
+}
+
+
+// ======================================
+// Load Locations
+// ======================================
+
 async function loadLocations() {
 
     try {
 
-        const response = await fetch("locations.json");
+        const response = await fetch(
+
+            "data/locations.json"
+
+        );
 
         locations = await response.json();
 
-        console.log("Locations Loaded:", locations.length);
-
     } catch (error) {
 
-        console.error("locations.json Error :", error);
+        console.error(error);
 
     }
 
 }
 
-// Initialize Search
-function initSearch() {
 
-    const input = document.getElementById("searchInput");
+// ======================================
+// Setup Search
+// ======================================
+
+function setupSearch() {
+
+    const input = document.getElementById(
+
+        "searchInput"
+
+    );
 
     if (!input) return;
 
-    input.addEventListener("input", function () {
+    input.addEventListener(
 
-        searchLocation(this.value);
+        "input",
 
-    });
+        searchLocation
+
+    );
 
 }
 
-// Search
-function searchLocation(keyword) {
 
-    keyword = keyword.trim().toLowerCase();
+// ======================================
+// Search Location
+// ======================================
 
-    const resultBox = document.getElementById("searchResult");
+function searchLocation(event) {
 
-    resultBox.innerHTML = "";
+    const keyword = event.target.value
 
-    if (keyword === "") return;
+        .trim()
 
-    filteredLocations = locations.filter(item => {
+        .toLowerCase();
 
-        return (
+    if (keyword === "") {
 
-            item.village_mm?.includes(keyword) ||
+        clearSearch();
 
-            item.village_en?.toLowerCase().includes(keyword) ||
+        return;
 
-            item.township_mm?.includes(keyword) ||
+    }
 
-            item.township_en?.toLowerCase().includes(keyword)
+    filteredLocations = locations.filter(
 
-        );
+        location =>
 
-    });
+            location.name
 
-    filteredLocations.slice(0,10).forEach(item=>{
+            .toLowerCase()
 
-        const div=document.createElement("div");
+            .includes(keyword)
 
-        div.className="search-item";
+    );
 
-        div.innerHTML=`
-        <strong>${item.village_mm}</strong><br>
-        <small>${item.township_mm}</small>
-        `;
+    renderSearchResults();
 
-        div.onclick=()=>{
+}
 
-            document.getElementById("searchInput").value=item.village_mm;
 
-            resultBox.innerHTML="";
+// ======================================
+// Render Results
+// ======================================
 
-            if(typeof getWeatherByLocation==="function"){
+function renderSearchResults() {
 
-                getWeatherByLocation(
-                    item.latitude,
-                    item.longitude
-                );
+    const list = document.getElementById(
 
-            }
+        "searchResults"
+
+    );
+
+    if (!list) return;
+
+    list.innerHTML = "";
+
+    filteredLocations.forEach(location => {
+
+        const item = document.createElement("div");
+
+        item.className = "search-item";
+
+        item.textContent = location.name;
+
+        item.onclick = () => {
+
+            selectLocation(location);
 
         };
 
-        resultBox.appendChild(div);
+        list.appendChild(item);
 
     });
 
 }
+
+
+// ======================================
+// Select Location
+// ======================================
+
+function selectLocation(location) {
+
+    APP.currentLocation = {
+
+        latitude: location.latitude,
+
+        longitude: location.longitude,
+
+        name: location.name
+
+    };
+
+    clearSearch();
+
+    refreshAll();
+
+}
+
+
+// ======================================
+// Clear Search
+// ======================================
+
+function clearSearch() {
+
+    const list = document.getElementById(
+
+        "searchResults"
+
+    );
+
+    if (list) {
+
+        list.innerHTML = "";
+
+    }
+
+        }

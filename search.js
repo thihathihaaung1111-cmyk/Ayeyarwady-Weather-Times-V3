@@ -5,15 +5,7 @@
 
 "use strict";
 
-
-// ======================================
-// Search Variables
-// ======================================
-
 let locations = [];
-
-let filteredLocations = [];
-
 
 // ======================================
 // Initialize Search
@@ -21,28 +13,21 @@ let filteredLocations = [];
 
 async function initSearch() {
 
-    await loadLocations();
-
-    setupSearch();
-
-}
-
-
-// ======================================
-// Load Locations
-// ======================================
-
-async function loadLocations() {
-
     try {
 
-        const response = await fetch(
+        const response = await fetch("locations.json");
 
-            "locations.json"
+        if (!response.ok) {
 
-        );
+            throw new Error("Cannot load locations.json");
+
+        }
 
         locations = await response.json();
+
+        console.log("Locations Loaded:", locations.length);
+
+        setupSearch();
 
     } catch (error) {
 
@@ -52,92 +37,83 @@ async function loadLocations() {
 
 }
 
-
 // ======================================
 // Setup Search
 // ======================================
 
 function setupSearch() {
 
-    const input = document.getElementById(
-
-        "searchInput"
-
-    );
+    const input = document.getElementById("searchInput");
 
     if (!input) return;
 
-    input.addEventListener(
+    input.addEventListener("input", function () {
 
-        "input",
+        searchLocation(this.value);
 
-        searchLocation
-
-    );
+    });
 
 }
 
-
 // ======================================
-// Search Location
+// Search
 // ======================================
 
-function searchLocation(event) {
+function searchLocation(keyword) {
 
-    const keyword = event.target.value
+    const resultBox = document.getElementById("searchResult");
 
-        .trim()
+    if (!resultBox) return;
 
-        .toLowerCase();
+    resultBox.innerHTML = "";
 
-    if (keyword === "") {
+    keyword = keyword.trim().toLowerCase();
 
-        clearSearch();
+    if (keyword === "") return;
+
+    const results = locations.filter(location => {
+
+        return (
+
+            location.township_mm.includes(keyword) ||
+
+            location.village_mm.includes(keyword) ||
+
+            location.township_en.toLowerCase().includes(keyword) ||
+
+            location.village_en.toLowerCase().includes(keyword)
+
+        );
+
+    }).slice(0, 20);
+
+    if (results.length === 0) {
+
+        resultBox.innerHTML = "<div class='search-item'>မတွေ့ပါ</div>";
 
         return;
 
     }
 
-    filteredLocations = locations.filter(
-
-        location =>
-
-            location.name
-
-            .toLowerCase()
-
-            .includes(keyword)
-
-    );
-
-    renderSearchResults();
-
-}
-
-
-// ======================================
-// Render Results
-// ======================================
-
-function renderSearchResults() {
-
-    const list = document.getElementById(
-
-        "searchResults"
-
-    );
-
-    if (!list) return;
-
-    list.innerHTML = "";
-
-    filteredLocations.forEach(location => {
+    results.forEach(location => {
 
         const item = document.createElement("div");
 
         item.className = "search-item";
 
-        item.textContent = location.name;
+        item.innerHTML =
+
+            "<strong>" +
+
+            location.village_mm +
+
+            "</strong><br>" +
+
+            "<small>" +
+
+            location.township_mm +
+
+            "</small>";
 
         item.onclick = () => {
 
@@ -145,12 +121,11 @@ function renderSearchResults() {
 
         };
 
-        list.appendChild(item);
+        resultBox.appendChild(item);
 
     });
 
 }
-
 
 // ======================================
 // Select Location
@@ -164,33 +139,46 @@ function selectLocation(location) {
 
         longitude: location.longitude,
 
-        name: location.name
+        township: location.township_mm,
+
+        village: location.village_mm
 
     };
 
-    clearSearch();
+    document.getElementById("locationName").textContent =
 
-    refreshAll();
+        location.village_mm;
 
-}
+    document.getElementById("searchInput").value =
 
+        location.village_mm;
 
-// ======================================
-// Clear Search
-// ======================================
+    document.getElementById("searchResult").innerHTML = "";
 
-function clearSearch() {
+    if (typeof loadWeather === "function") {
 
-    const list = document.getElementById(
-
-        "searchResults"
-
-    );
-
-    if (list) {
-
-        list.innerHTML = "";
+        loadWeather();
 
     }
 
-        }
+    if (typeof loadForecast === "function") {
+
+        loadForecast();
+
+    }
+
+    if (typeof loadRiver === "function") {
+
+        loadRiver();
+
+    }
+
+    if (typeof loadTide === "function") {
+
+        loadTide();
+
+    }
+
+    console.log("Selected:", APP.currentLocation);
+
+}

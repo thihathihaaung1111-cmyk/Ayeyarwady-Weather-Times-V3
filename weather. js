@@ -1,47 +1,55 @@
 // ======================================
-// Ayeyarwady Weather Times V3
 // weather.js
 // ======================================
 
 "use strict";
 
-
-// ======================================
-// Initialize Weather
-// ======================================
+let weatherData = null;
 
 function initWeather() {
 
-    console.log("Weather Module Ready");
+    if (APP.currentLocation) {
+
+        loadWeather();
+
+    }
 
 }
 
-
-// ======================================
-// Load Weather
-// ======================================
-
 async function loadWeather() {
+
+    if (!APP.currentLocation) {
+
+        console.warn("No Location");
+
+        return;
+
+    }
 
     try {
 
-        if (!APP.currentLocation) {
+        const lat = APP.currentLocation.latitude;
 
-            console.warn("Location Not Found");
+        const lon = APP.currentLocation.longitude;
 
-            return;
+        const url =
+        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&hourly=precipitation_probability&timezone=auto`;
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+
+            throw new Error("Weather API Error");
 
         }
 
-        await getWeatherByLocation(
+        weatherData = await response.json();
 
-            APP.currentLocation.latitude,
+        renderWeather();
 
-            APP.currentLocation.longitude
+    }
 
-        );
-
-    } catch (error) {
+    catch (error) {
 
         console.error(error);
 
@@ -49,24 +57,42 @@ async function loadWeather() {
 
 }
 
+function renderWeather() {
 
-// ======================================
-// Render Weather
-// ======================================
+    if (!weatherData) return;
 
-function renderWeather(data) {
+    const current = weatherData.current;
 
-    updateWeather(data);
+    document.getElementById("temperature").textContent =
+        current.temperature_2m + "°C";
+
+    document.getElementById("humidity").textContent =
+        current.relative_humidity_2m + "%";
+
+    document.getElementById("wind").textContent =
+        current.wind_speed_10m + " km/h";
+
+    document.getElementById("weatherText").textContent =
+        weatherCodeToText(current.weather_code);
 
 }
 
+function weatherCodeToText(code) {
 
-// ======================================
-// Refresh Weather
-// ======================================
+    switch (code) {
 
-async function refreshWeather() {
-
-    await loadWeather();
+        case 0: return "☀️ ကြည်လင်";
+        case 1: return "🌤️ အနည်းငယ်တိမ်";
+        case 2: return "⛅ တိမ်အသင့်";
+        case 3: return "☁️ တိမ်ထူ";
+        case 45: return "🌫️ မြူ";
+        case 51: return "🌦️ မိုးဖွဲ";
+        case 61: return "🌧️ မိုး";
+        case 63: return "🌧️ မိုးအသင့်";
+        case 65: return "🌧️ မိုးသည်း";
+        case 80: return "🌦️ မိုးရွာ";
+        case 95: return "⛈️ မိုးကြိုး";
+        default: return "မသိ";
+    }
 
 }

@@ -1,20 +1,13 @@
 // ======================================
-// Ayeyarwady Weather Times V3
 // notification.js
 // ======================================
 
 "use strict";
 
+let notificationPermission = false;
 
 // ======================================
-// Notification Variables
-// ======================================
-
-let notificationPermission = "default";
-
-
-// ======================================
-// Initialize Notification
+// Initialize
 // ======================================
 
 async function initNotifications() {
@@ -27,53 +20,57 @@ async function initNotifications() {
 
     }
 
-    notificationPermission = Notification.permission;
+    if (Notification.permission === "granted") {
 
-    if (notificationPermission === "default") {
-
-        notificationPermission = await Notification.requestPermission();
-
-    }
-
-    console.log("Notification:", notificationPermission);
-
-}
-
-
-// ======================================
-// Show Notification
-// ======================================
-
-function showNotification(title, message) {
-
-    if (notificationPermission !== "granted") {
+        notificationPermission = true;
 
         return;
 
     }
 
+    if (Notification.permission !== "denied") {
+
+        const permission = await Notification.requestPermission();
+
+        notificationPermission = permission === "granted";
+
+    }
+
+}
+
+// ======================================
+// Show Notification
+// ======================================
+
+function showNotification(title, message, icon = "icon-192.png") {
+
+    if (!notificationPermission) return;
+
     new Notification(title, {
 
         body: message,
 
-        icon: "assets/icons/icon-192.png",
+        icon: icon,
 
-        badge: "assets/icons/icon-192.png"
+        badge: icon,
+
+        vibrate: [200, 100, 200],
+
+        tag: "awt-v3"
 
     });
 
 }
 
-
 // ======================================
-// Weather Notification
+// Flood Alert
 // ======================================
 
-function notifyWeather(message) {
+function notifyFlood(message) {
 
     showNotification(
 
-        "🌦️ Weather Alert",
+        "🌊 Flood Alert",
 
         message
 
@@ -81,43 +78,8 @@ function notifyWeather(message) {
 
 }
 
-
 // ======================================
-// River Notification
-// ======================================
-
-function notifyRiver(message) {
-
-    showNotification(
-
-        "🌊 River Alert",
-
-        message
-
-    );
-
-}
-
-
-// ======================================
-// Tide Notification
-// ======================================
-
-function notifyTide(message) {
-
-    showNotification(
-
-        "🌙 Tide Alert",
-
-        message
-
-    );
-
-}
-
-
-// ======================================
-// Cyclone Notification
+// Cyclone Alert
 // ======================================
 
 function notifyCyclone(message) {
@@ -132,19 +94,34 @@ function notifyCyclone(message) {
 
 }
 
-
 // ======================================
-// Emergency Notification
+// Weather Alert
 // ======================================
 
-function notifyEmergency(message) {
+function notifyWeather(message) {
 
     showNotification(
 
-        "🚨 Emergency Warning",
+        "🌦 Weather Alert",
 
         message
 
     );
 
 }
+
+// ======================================
+// Test
+// ======================================
+
+function testNotification() {
+
+    showNotification(
+
+        "Ayeyarwady Weather",
+
+        "Notification System Ready"
+
+    );
+
+        }

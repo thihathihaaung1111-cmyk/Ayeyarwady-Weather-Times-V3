@@ -1,28 +1,24 @@
 // ======================================
-// Ayeyarwady Weather Times V3
 // tide.js
 // ======================================
 
 "use strict";
 
-
-// ======================================
-// Tide Variables
-// ======================================
-
 let tideData = null;
 
-
 // ======================================
-// Initialize Tide
+// Initialize
 // ======================================
 
 function initTide() {
 
-    console.log("Tide Module Ready");
+    if (APP.currentLocation) {
+
+        loadTide();
+
+    }
 
 }
-
 
 // ======================================
 // Load Tide
@@ -30,20 +26,34 @@ function initTide() {
 
 async function loadTide() {
 
+    if (!APP.currentLocation) return;
+
     try {
 
-        if (!APP.currentLocation) {
-
-            console.warn("Location Not Found");
-
-            return;
-
-        }
-
         // TODO:
-        // Load Tide API
+        // နောက်ပိုင်း Tide API / Google Sheet နဲ့ချိတ်မယ်။
 
-    } catch (error) {
+        tideData = {
+
+            station: APP.currentLocation.township,
+
+            highTide: "08:15 AM",
+
+            lowTide: "02:40 PM",
+
+            nextHigh: "08:55 PM",
+
+            status: "High Tide",
+
+            updated: new Date()
+
+        };
+
+        renderTide();
+
+    }
+
+    catch (error) {
 
         console.error(error);
 
@@ -51,74 +61,44 @@ async function loadTide() {
 
 }
 
-
 // ======================================
-// Render Tide
-// ======================================
-
-function renderTide(data) {
-
-    tideData = data;
-
-    updateTide(data);
-
-}
-
-
-// ======================================
-// Update Tide
+// Render
 // ======================================
 
-function updateTide(data) {
+function renderTide() {
 
-    const level = document.getElementById("tideLevel");
+    if (!tideData) return;
 
-    const status = document.getElementById("tideStatus");
+    const box = document.getElementById("riverInfo");
 
-    const next = document.getElementById("nextTide");
+    if (!box) return;
 
-    if (!level || !status || !next) return;
+    box.innerHTML += `
 
-    level.textContent = data.level + " m";
+        <div class="tide-card">
 
-    status.textContent = getTideStatus(data.type);
+            <h3>🌊 Tide Information</h3>
 
-    next.textContent = data.next;
+            <p>📍 ${tideData.station}</p>
 
-}
+            <p>⬆ High Tide : ${tideData.highTide}</p>
 
+            <p>⬇ Low Tide : ${tideData.lowTide}</p>
 
-// ======================================
-// Refresh Tide
-// ======================================
+            <p>🔄 Next High : ${tideData.nextHigh}</p>
 
-async function refreshTide() {
+            <p><strong>${tideData.status}</strong></p>
 
-    await loadTide();
+            <small>
 
-}
+                Updated :
 
+                ${tideData.updated.toLocaleString()}
 
-// ======================================
-// Tide Status
-// ======================================
+            </small>
 
-function getTideStatus(type) {
+        </div>
 
-    switch (type) {
+    `;
 
-        case "HIGH":
-
-            return "ဒီရေတက်";
-
-        case "LOW":
-
-            return "ဒီရေကျ";
-
-        default:
-
-            return "မသိ";
-
-    }
-
-        }
+            }

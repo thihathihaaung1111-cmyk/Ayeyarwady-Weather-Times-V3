@@ -105,4 +105,16 @@ function renderAlerts() {
 
     }
 
+    if (alertData.flood.level !== "Normal") {
+
+    notifyFlood(alertData.flood.message);
+
+}
+
+if (alertData.cyclone.level !== "None") {
+
+    notifyCyclone(alertData.cyclone.message);
+
+}
+
                                 }

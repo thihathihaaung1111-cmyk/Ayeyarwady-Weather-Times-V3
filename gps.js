@@ -1,48 +1,62 @@
 // ======================================
-// Ayeyarwady Weather Times V3
 // gps.js
 // ======================================
 
 "use strict";
 
-
-// ======================================
-// GPS Variables
-// ======================================
-
-let gpsWatcher = null;
-
-
-// ======================================
-// Initialize GPS
-// ======================================
-
 function initGPS() {
+
+    const button = document.getElementById("gpsBtn");
+
+    if (!button) return;
+
+    button.addEventListener("click", getCurrentLocation);
+
+}
+
+function getCurrentLocation() {
 
     if (!navigator.geolocation) {
 
-        console.error("GPS Not Supported");
+        alert("GPS မရပါ");
 
         return;
 
     }
 
-    getCurrentLocation();
-
-}
-
-
-// ======================================
-// Get Current Location
-// ======================================
-
-function getCurrentLocation() {
-
     navigator.geolocation.getCurrentPosition(
 
-        onLocationSuccess,
+        position => {
 
-        onLocationError,
+            APP.currentLocation = {
+
+                latitude: position.coords.latitude,
+
+                longitude: position.coords.longitude,
+
+                township: "Current Location",
+
+                village: "Current Location"
+
+            };
+
+            document.getElementById("locationName").textContent =
+                "Current Location";
+
+            if (typeof loadWeather === "function") loadWeather();
+            if (typeof loadForecast === "function") loadForecast();
+            if (typeof loadRiver === "function") loadRiver();
+            if (typeof loadTide === "function") loadTide();
+
+        },
+
+        error => {
+
+            console.error(error);
+
+            alert("GPS ရယူမရပါ");
+
+        },
 
         {
 
@@ -50,84 +64,10 @@ function getCurrentLocation() {
 
             timeout: 10000,
 
-            maximumAge: 300000
+            maximumAge: 0
 
         }
 
     );
-
-}
-
-
-// ======================================
-// Location Success
-// ======================================
-
-function onLocationSuccess(position) {
-
-    APP.currentLocation = {
-
-        latitude: position.coords.latitude,
-
-        longitude: position.coords.longitude,
-
-        accuracy: position.coords.accuracy
-
-    };
-
-    console.log(APP.currentLocation);
-
-    refreshAll();
-
-}
-
-
-// ======================================
-// Location Error
-// ======================================
-
-function onLocationError(error) {
-
-    console.error(error);
-
-}
-
-
-// ======================================
-// Watch Location
-// ======================================
-
-function startLocationWatcher() {
-
-    gpsWatcher = navigator.geolocation.watchPosition(
-
-        onLocationSuccess,
-
-        onLocationError,
-
-        {
-
-            enableHighAccuracy: true,
-
-            maximumAge: 300000
-
-        }
-
-    );
-
-}
-
-
-// ======================================
-// Stop Watcher
-// ======================================
-
-function stopLocationWatcher() {
-
-    if (gpsWatcher !== null) {
-
-        navigator.geolocation.clearWatch(gpsWatcher);
-
-    }
 
         }

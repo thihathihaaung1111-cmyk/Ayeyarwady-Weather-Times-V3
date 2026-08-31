@@ -341,4 +341,36 @@ padding:8px;
 
 }
 
+/* Transport */
+
+.transport-card{
+
+    padding:15px;
+
+    border-radius:12px;
+
+    background:#ffffff10;
+
+    border:1px solid rgba(255,255,255,.1);
+
+}
+
+.transport-card h3{
+
+    margin-bottom:10px;
+
+}
+
+.transport-card p{
+
+    margin:6px 0;
+
+}
+
+.transport-card small{
+
+    opacity:.7;
+
+}
+
    }

@@ -3,111 +3,157 @@
 // settings.js
 // ======================================
 
-const DEFAULT_SETTINGS = {
+"use strict";
 
-    theme: "light",
+
+// ======================================
+// Default Settings
+// ======================================
+
+const DEFAULT_SETTINGS = {
 
     language: "my",
 
+    theme: "auto",
+
+    temperature: "C",
+
+    wind: "kmh",
+
+    distance: "km",
+
+    pressure: "hPa",
+
     notifications: true,
 
-    autoLocation: true,
+    autoRefresh: true,
 
-    temperatureUnit: "C",
+    refreshInterval: 10,
 
-    windUnit: "kmh",
-
-    lastLocation: ""
+    gps: true
 
 };
 
-// Initialize Settings
+
+// ======================================
+// Current Settings
+// ======================================
+
+let appSettings = {};
+
+
+// ======================================
+// Initialize
+// ======================================
+
 function initSettings() {
 
     loadSettings();
 
+    applySettings();
+
 }
 
-// Load Settings
+
+// ======================================
+// Load
+// ======================================
+
 function loadSettings() {
 
-    const saved = localStorage.getItem("awt_settings");
+    const data = localStorage.getItem(
 
-    if (saved) {
+        "awt_settings"
 
-        applySettings(JSON.parse(saved));
+    );
 
-    } else {
+    if (data) {
 
-        saveSettings(DEFAULT_SETTINGS);
+        appSettings = JSON.parse(data);
 
-        applySettings(DEFAULT_SETTINGS);
+    }
+
+    else {
+
+        appSettings = {
+
+            ...DEFAULT_SETTINGS
+
+        };
 
     }
 
 }
 
-// Save Settings
-function saveSettings(settings) {
+
+// ======================================
+// Save
+// ======================================
+
+function saveSettings() {
 
     localStorage.setItem(
 
         "awt_settings",
 
-        JSON.stringify(settings)
+        JSON.stringify(appSettings)
 
     );
 
 }
 
-// Apply Settings
-function applySettings(settings) {
 
-    if (settings.theme === "dark") {
+// ======================================
+// Apply
+// ======================================
 
-        document.body.classList.add("dark");
+function applySettings() {
 
-    } else {
+    applyTheme();
 
-        document.body.classList.remove("dark");
-
-    }
-
-    console.log("Settings Loaded");
+    applyLanguage();
 
 }
 
-// Change Theme
-function changeTheme(theme) {
 
-    const settings = getSettings();
+// ======================================
+// Reset
+// ======================================
 
-    settings.theme = theme;
+function resetSettings() {
 
-    saveSettings(settings);
+    appSettings = {
 
-    applySettings(settings);
+        ...DEFAULT_SETTINGS
 
-}
+    };
 
-// Notification
-function toggleNotification(enable) {
+    saveSettings();
 
-    const settings = getSettings();
-
-    settings.notifications = enable;
-
-    saveSettings(settings);
+    applySettings();
 
 }
 
-// Get Settings
-function getSettings() {
 
-    return JSON.parse(
+// ======================================
+// Get
+// ======================================
 
-        localStorage.getItem("awt_settings")
+function getSetting(key) {
 
-    );
+    return appSettings[key];
+
+}
+
+
+// ======================================
+// Set
+// ======================================
+
+function setSetting(key, value) {
+
+    appSettings[key] = value;
+
+    saveSettings();
 
 }

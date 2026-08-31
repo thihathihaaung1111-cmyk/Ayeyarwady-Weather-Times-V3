@@ -1,334 +1,136 @@
 // ======================================
 // Ayeyarwady Weather Times V3
 // ai.js
-// Part 1
 // ======================================
 
 "use strict";
 
+let aiMessage = "";
 
 // ======================================
-// AI Variables
+// Initialize
 // ======================================
 
-let aiResult = "";
+function initAI() {
 
-let aiRisk = "LOW";
-
-let aiData = {};
-
-
-// ======================================
-// Initialize AI
-// ======================================
-
-async function initAI() {
-
-    await loadAIMessages();
-
-    console.log("AI Module Ready");
+    analyzeAll();
 
 }
 
-
 // ======================================
-// Analyze All
+// Analyze
 // ======================================
 
 function analyzeAll() {
 
-    aiResult = "";
+    let messages = [];
 
-    aiRisk = "LOW";
+    // Weather
+    if (typeof weatherData !== "undefined" && weatherData) {
 
-    analyzeWeather();
+        const temp = weatherData.current.temperature_2m;
 
-    analyzeRiver();
+        if (temp >= 38) {
 
-    analyzeTide();
+            messages.push("🌡️ အပူချိန် အလွန်မြင့်နေပါသည်။");
 
-    analyzeCyclone();
+        }
+
+        else if (temp <= 20) {
+
+            messages.push("🥶 အပူချိန် နိမ့်နေပါသည်။");
+
+        }
+
+        else {
+
+            messages.push("🌤️ အပူချိန် ပုံမှန်ဖြစ်ပါသည်။");
+
+        }
+
+        const humidity = weatherData.current.relative_humidity_2m;
+
+        if (humidity >= 85) {
+
+            messages.push("💧 စိုထိုင်းဆ မြင့်နေပါသည်။");
+
+        }
+
+    }
+
+    // River
+    if (typeof riverData !== "undefined" && riverData) {
+
+        if (riverData.level >= riverData.danger) {
+
+            messages.push("🌊 မြစ်ရေ အန္တရာယ်အဆင့် ရောက်နေပါသည်။");
+
+        }
+
+        else {
+
+            messages.push("🌊 မြစ်ရေ အခြေအနေ ပုံမှန်ဖြစ်ပါသည်။");
+
+        }
+
+    }
+
+    // Tide
+    if (typeof tideData !== "undefined" && tideData) {
+
+        messages.push(
+
+            "🌊 နောက် High Tide - " +
+
+            tideData.nextHigh
+
+        );
+
+    }
+
+    // Alerts
+    if (typeof alertData !== "undefined" && alertData) {
+
+        if (alertData.cyclone.level !== "None") {
+
+            messages.push("🌀 မုန်တိုင်း သတိပေးချက် ရှိပါသည်။");
+
+        }
+
+        if (alertData.flood.level !== "Normal") {
+
+            messages.push("⚠️ ရေကြီးနိုင်ခြေ ရှိပါသည်။");
+
+        }
+
+    }
+
+    if (messages.length === 0) {
+
+        messages.push(
+
+            "📊 ဒေတာများကို စောင့်ဆိုင်းနေပါသည်..."
+
+        );
+
+    }
+
+    aiMessage = messages.join("<br><br>");
 
     renderAI();
 
 }
 
-
 // ======================================
-// Weather Analysis
-// ======================================
-
-function analyzeWeather() {
-
-    if (!window.weatherData) return;
-
-    const temp = weatherData.current.temperature_2m;
-
-    const rain = weatherData.current.rain;
-
-    if (temp >= 38) {
-
-        addAIMessage(
-            "🌡️ အပူချိန်မြင့်မားနေပါသည်။ နေ့လယ်ပိုင်းတွင် အပြင်ထွက်လှုပ်ရှားမှုကို လျှော့ချပါ။"
-        );
-
-    }
-
-    if (rain > 10) {
-
-        addAIMessage(
-            "🌧️ မိုးရွာနိုင်ခြေများပါသည်။ ထီး၊ မိုးကာများ ဆောင်ထားပါ။"
-        );
-
-    }
-
-}
-
-
-// ======================================
-// River Analysis
-// ======================================
-
-function analyzeRiver() {
-
-    if (!window.riverData) return;
-
-    if (riverData.level >= 12) {
-
-        aiRisk = "HIGH";
-
-        addAIMessage(
-            "🌊 မြစ်ရေ အန္တရာယ်အဆင့်သို့ ရောက်ရှိနေပါသည်။"
-        );
-
-    }
-
-    else if (riverData.level >= 10) {
-
-        aiRisk = "MEDIUM";
-
-        addAIMessage(
-            "⚠️ မြစ်ရေ တိုးလာနေပါသည်။"
-        );
-
-    }
-
-}
-
-
-// ======================================
-// Add AI Message
-// ======================================
-
-function addAIMessage(message) {
-
-    aiResult += "• " + message + "\n";
-
-        }
-
-// ======================================
-// Tide Analysis
-// ======================================
-
-function analyzeTide() {
-
-    if (!window.tideData) return;
-
-    if (tideData.type === "HIGH") {
-
-        addAIMessage(
-            "🌊 ဒီရေတက်ချိန်ဖြစ်နေပါသည်။ မြစ်ကမ်းနှင့် ကမ်းရိုးတန်းအနီး သတိထားပါ။"
-        );
-
-    }
-
-}
-
-
-// ======================================
-// Cyclone Analysis
-// ======================================
-
-function analyzeCyclone() {
-
-    if (!window.cycloneData) return;
-
-    if (cycloneData.level >= 3) {
-
-        aiRisk = "HIGH";
-
-        addAIMessage(
-            "🌀 မုန်တိုင်းအန္တရာယ် မြင့်မားနေပါသည်။"
-        );
-
-    }
-
-    else if (cycloneData.level >= 2) {
-
-        if (aiRisk !== "HIGH") {
-
-            aiRisk = "MEDIUM";
-
-        }
-
-        addAIMessage(
-            "⚠️ မုန်တိုင်းကို ဆက်လက်စောင့်ကြည့်ပါ။"
-        );
-
-    }
-
-}
-
-
-// ======================================
-// Render AI
+// Render
 // ======================================
 
 function renderAI() {
 
-    const result = document.getElementById("aiResult");
+    const box = document.getElementById("aiText");
 
-    const risk = document.getElementById("aiRisk");
+    if (!box) return;
 
-    if (!result || !risk) return;
+    box.innerHTML = aiMessage;
 
-    if (aiResult === "") {
-
-        aiResult =
-            "✅ လက်ရှိအခြေအနေအရ ထူးခြားသော အန္တရာယ် မတွေ့ရှိရသေးပါ။";
-
-    }
-
-    result.textContent = aiResult;
-
-    risk.textContent = aiRisk;
-
-    risk.className = getRiskClass(aiRisk);
-
-}
-
-
-// ======================================
-// Risk Class
-// ======================================
-
-function getRiskClass(level) {
-
-    switch (level) {
-
-        case "HIGH":
-            return "danger";
-
-        case "MEDIUM":
-            return "warning";
-
-        default:
-            return "normal";
-
-    }
-
-}
-
-
-// ======================================
-// Refresh AI
-// ======================================
-
-function refreshAI() {
-
-    analyzeAll();
-
-            }
-
-// ======================================
-// AI Message Engine
-// ======================================
-
-let aiMessages = {};
-
-
-// ======================================
-// Load AI Messages
-// ======================================
-
-async function loadAIMessages() {
-
-    try {
-
-        const response = await fetch(
-
-            "data/ai_messages.json"
-
-        );
-
-        aiMessages = await response.json();
-
-    }
-
-    catch (error) {
-
-        console.error(error);
-
-    }
-
-}
-
-
-// ======================================
-// Get AI Message
-// ======================================
-
-function getAIMessage(category, key) {
-
-    if (
-
-        !aiMessages[category] ||
-
-        !aiMessages[category][key]
-
-    ) {
-
-        return "";
-
-    }
-
-    const list = aiMessages[category][key];
-
-    if (!Array.isArray(list)) {
-
-        return "";
-
-    }
-
-    const index = Math.floor(
-
-        Math.random() * list.length
-
-    );
-
-    return list[index];
-
-}
-
-
-// ======================================
-// Add Smart Message
-// ======================================
-
-function addSmartMessage(category, key) {
-
-    const message = getAIMessage(
-
-        category,
-
-        key
-
-    );
-
-    if (message !== "") {
-
-        addAIMessage(message);
-
-    }
-
-        }
+                          }

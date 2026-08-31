@@ -1,55 +1,26 @@
 // ======================================
 // Ayeyarwady Weather Times V3
 // Main Controller
-// script.js
+// Part 1
 // ======================================
 
 "use strict";
 
-
-// ======================================
-// Global Variables
-// ======================================
-
 const APP = {
-
     version: "3.0.0",
-
     name: "Ayeyarwady Weather Times",
-
     initialized: false,
-
     online: navigator.onLine,
-
     currentLocation: null,
-
-    lastUpdate: null
-
+    lastUpdate: null,
+    refreshTimer: null
 };
 
-
-// ======================================
-// App Start
-// ======================================
-
-document.addEventListener(
-
-    "DOMContentLoaded",
-
-    () => {
-
-        startApp();
-
-    }
-
-);
-
-
-// ======================================
-// Start App
-// ======================================
+document.addEventListener("DOMContentLoaded", startApp);
 
 async function startApp() {
+
+    console.log("Starting App...");
 
     try {
 
@@ -69,219 +40,190 @@ async function startApp() {
 
         hideLoading();
 
-        console.log("App Ready");
+        console.log("Application Ready");
 
     } catch (error) {
 
-        console.error(error);
+        console.error("Start Error:", error);
+
+        hideLoading();
 
     }
 
 }
-
-
-// ======================================
-// Initialize Modules
-// ======================================
 
 async function initModules() {
 
-    initSettings();
+    const modules = [
 
-    initTheme();
+        "initStorage",
+        "initSettings",
+        "initTheme",
+        "initNotifications",
+        "initGPS",
+        "initSearch",
+        "initWeather",
+        "initForecast",
+        "initRiver",
+        "initTide",
+        "initCyclone",
+        "initAlert",
+        "initArticles",
+        "initTransport",
+        "initProducts",
+        "initShops",
+        "initNews",
+        "initAgriculture",
+        "initAI"
 
-    initNotifications();
+    ];
 
-    initGPS();
+    for (const fn of modules) {
 
-    initSearch();
+        if (typeof window[fn] === "function") {
 
-    initWeather();
+            try {
 
-    initForecast();
+                await window[fn]();
 
-    initRiver();
+                console.log(fn + " OK");
 
-    initTide();
+            } catch (err) {
 
-    initCyclone();
+                console.error(fn, err);
 
-    initAlert();
+            }
 
-    initArticles();
+        } else {
 
-    initTransport();
+            console.warn(fn + " Missing");
 
-    initProducts();
+        }
 
-    initShops();
-
-    initNews();
-
-    initAgriculture();
-
-    initAI();
+    }
 
 }
-
-
-// ======================================
-// Event System
-// ======================================
 
 function setupEvents() {
 
-    window.addEventListener(
+    window.addEventListener("online", () => {
 
-        "online",
+        APP.online = true;
 
-        handleOnline
-
-    );
-
-    window.addEventListener(
-
-        "offline",
-
-        handleOffline
-
-    );
-
-    document.addEventListener(
-
-        "visibilitychange",
-
-        handleVisibility
-
-    );
-
-    const refreshBtn = document.getElementById(
-
-        "refreshBtn"
-
-    );
-
-    if (refreshBtn) {
-
-        refreshBtn.addEventListener(
-
-            "click",
-
-            refreshAll
-
-        );
-
-    }
-
-}
-
-
-// ======================================
-// Online
-// ======================================
-
-function handleOnline() {
-
-    APP.online = true;
-
-    updateNetworkStatus();
-
-    console.log("Internet Connected");
-
-    refreshAll();
-
-}
-
-
-// ======================================
-// Offline
-// ======================================
-
-function handleOffline() {
-
-    APP.online = false;
-
-    updateNetworkStatus();
-
-    console.log("Internet Disconnected");
-
-}
-
-
-// ======================================
-// Visibility
-// ======================================
-
-function handleVisibility() {
-
-    if (
-
-        document.visibilityState === "visible"
-
-    ) {
+        updateNetworkStatus();
 
         refreshAll();
 
+    });
+
+    window.addEventListener("offline", () => {
+
+        APP.online = false;
+
+        updateNetworkStatus();
+
+    });
+
+    document.addEventListener("visibilitychange", () => {
+
+        if (document.visibilityState === "visible") {
+
+            refreshAll();
+
+        }
+
+    });
+
+}
+
+function showLoading() {
+
+    const splash = document.getElementById("splash");
+
+    if (splash) {
+
+        splash.style.display = "flex";
+
     }
 
 }
 
+function hideLoading() {
+
+    const splash = document.getElementById("splash");
+
+    if (splash) {
+
+        setTimeout(() => {
+
+            splash.style.display = "none";
+
+        }, 800);
+
+    }
+
+            }
 
 // ======================================
-// Refresh All
+// Refresh All Data
 // ======================================
 
 async function refreshAll() {
 
-    try {
+    console.log("Refreshing...");
 
-        showLoading();
+    APP.lastUpdate = new Date();
 
-        APP.lastUpdate = new Date();
+    const loaders = [
 
-        if (APP.online) {
+        "loadWeather",
+        "loadForecast",
+        "loadRiver",
+        "loadTide",
+        "loadCyclone",
+        "loadAlerts",
+        "loadArticles",
+        "loadTransport",
+        "loadProducts",
+        "loadShops",
+        "loadNews",
+        "loadAgriculture"
 
-            await loadWeather();
+    ];
 
-            await loadForecast();
+    showLoading();
 
-            await loadRiver();
+    for (const fn of loaders) {
 
-            await loadTide();
+        if (typeof window[fn] === "function") {
 
-            await loadCyclone();
+            try {
 
-            await loadAlerts();
+                await window[fn]();
 
-            await loadArticles();
+                console.log(fn + " OK");
 
-            await loadTransport();
+            }
 
-            await loadProducts();
+            catch (error) {
 
-            await loadShops();
+                console.error(fn, error);
 
-            await loadNews();
-
-            await loadAgriculture();
+            }
 
         }
 
-        initAI();
+    }
 
-        updateLastUpdate();
+    if (typeof analyzeAll === "function") {
 
-        hideLoading();
-
-        console.log("Refresh Complete");
-
-    } catch (error) {
-
-        console.error(error);
-
-        hideLoading();
+        analyzeAll();
 
     }
+
+    updateLastUpdate();
+
+    hideLoading();
 
 }
 
@@ -302,51 +244,10 @@ function updateLastUpdate() {
 
     element.textContent =
 
-        APP.lastUpdate.toLocaleString();
+        APP.lastUpdate.toLocaleString("en-GB");
 
 }
 
-
-// ======================================
-// Show Loading
-// ======================================
-
-function showLoading() {
-
-    const loading = document.getElementById(
-
-        "loading"
-
-    );
-
-    if (loading) {
-
-        loading.style.display = "flex";
-
-    }
-
-}
-
-
-// ======================================
-// Hide Loading
-// ======================================
-
-function hideLoading() {
-
-    const loading = document.getElementById(
-
-        "loading"
-
-    );
-
-    if (loading) {
-
-        loading.style.display = "none";
-
-    }
-
-}
 
 // ======================================
 // Auto Refresh
@@ -354,9 +255,13 @@ function hideLoading() {
 
 function startAutoRefresh() {
 
-    // 10 Minutes
+    if (APP.refreshTimer) {
 
-    setInterval(() => {
+        clearInterval(APP.refreshTimer);
+
+    }
+
+    APP.refreshTimer = setInterval(() => {
 
         if (APP.online) {
 
@@ -394,17 +299,15 @@ function updateClock() {
 
     const now = new Date();
 
-    clock.textContent = now.toLocaleTimeString(
+    clock.textContent =
 
-        "en-GB"
-
-    );
+        now.toLocaleTimeString();
 
 }
 
 
 // ======================================
-// Network Status
+// Network
 // ======================================
 
 function updateNetworkStatus() {
@@ -417,14 +320,69 @@ function updateNetworkStatus() {
 
     if (!network) return;
 
-    if (APP.online) {
+    network.textContent =
 
-        network.textContent = "🟢 Online";
+        APP.online ?
 
-    } else {
+        "🟢 Online"
 
-        network.textContent = "🔴 Offline";
+        :
 
-    }
+        "🔴 Offline";
 
 }
+
+
+// ======================================
+// Restart App
+// ======================================
+
+function restartApp() {
+
+    refreshAll();
+
+}
+
+
+// ======================================
+// App Information
+// ======================================
+
+function getAppInfo() {
+
+    return {
+
+        name: APP.name,
+
+        version: APP.version,
+
+        online: APP.online,
+
+        initialized: APP.initialized,
+
+        location: APP.currentLocation,
+
+        lastUpdate: APP.lastUpdate
+
+    };
+
+}
+
+
+// ======================================
+// Debug
+// ======================================
+
+window.APP = APP;
+
+console.log(
+
+    APP.name +
+
+    " Version " +
+
+    APP.version +
+
+    " Loaded"
+
+);

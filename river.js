@@ -1,49 +1,50 @@
 // ======================================
-// Ayeyarwady Weather Times V3
 // river.js
 // ======================================
 
 "use strict";
 
-
-// ======================================
-// River Variables
-// ======================================
-
 let riverData = null;
-
-
-// ======================================
-// Initialize River
-// ======================================
 
 function initRiver() {
 
-    console.log("River Module Ready");
+    if (APP.currentLocation) {
+
+        loadRiver();
+
+    }
 
 }
 
-
-// ======================================
-// Load River
-// ======================================
-
 async function loadRiver() {
+
+    if (!APP.currentLocation) return;
 
     try {
 
-        if (!APP.currentLocation) {
-
-            console.warn("Location Not Found");
-
-            return;
-
-        }
-
         // TODO:
-        // River API
+        // နောက်ပိုင်း Hydro API နဲ့ ချိတ်မယ်။
+        // အခု Sample Data သုံးထားတယ်။
 
-    } catch (error) {
+        riverData = {
+
+            station: APP.currentLocation.township,
+
+            level: 3.25,
+
+            danger: 6.00,
+
+            status: "Normal",
+
+            updated: new Date()
+
+        };
+
+        renderRiver();
+
+    }
+
+    catch (error) {
 
         console.error(error);
 
@@ -51,93 +52,50 @@ async function loadRiver() {
 
 }
 
+function renderRiver() {
 
-// ======================================
-// Render River
-// ======================================
+    if (!riverData) return;
 
-function renderRiver(data) {
+    const box = document.getElementById("riverInfo");
 
-    riverData = data;
+    if (!box) return;
 
-    updateRiver(data);
+    let color = "#22c55e";
+
+    if (riverData.level >= riverData.danger) {
+
+        color = "#ef4444";
+
+        riverData.status = "Danger";
+
+    }
+
+    box.innerHTML = `
+
+        <div class="river-card">
+
+            <h3>${riverData.station}</h3>
+
+            <p>🌊 Water Level : <b>${riverData.level} m</b></p>
+
+            <p>⚠ Danger Level : <b>${riverData.danger} m</b></p>
+
+            <p style="color:${color}">
+
+                ${riverData.status}
+
+            </p>
+
+            <small>
+
+                Updated :
+
+                ${riverData.updated.toLocaleString()}
+
+            </small>
+
+        </div>
+
+    `;
 
 }
-
-
-// ======================================
-// Update River
-// ======================================
-
-function updateRiver(data) {
-
-    const level = document.getElementById("riverLevel");
-
-    const status = document.getElementById("riverStatus");
-
-    if (!level || !status) return;
-
-    level.textContent = data.level + " m";
-
-    status.textContent = getRiverStatus(data.level);
-
-    status.className = getRiverClass(data.level);
-
-}
-
-
-// ======================================
-// Refresh River
-// ======================================
-
-async function refreshRiver() {
-
-    await loadRiver();
-
-}
-
-
-// ======================================
-// River Status
-// ======================================
-
-function getRiverStatus(level) {
-
-    if (level >= 12) {
-
-        return "အန္တရာယ်";
-
-    }
-
-    if (level >= 10) {
-
-        return "သတိပေး";
-
-    }
-
-    return "ပုံမှန်";
-
-}
-
-
-// ======================================
-// River Class
-// ======================================
-
-function getRiverClass(level) {
-
-    if (level >= 12) {
-
-        return "danger";
-
-    }
-
-    if (level >= 10) {
-
-        return "warning";
-
-    }
-
-    return "normal";
-
-    }

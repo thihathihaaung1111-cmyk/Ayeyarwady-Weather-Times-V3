@@ -1,73 +1,102 @@
 // ======================================
-// Ayeyarwady Weather Times V3
 // transport.js
 // ======================================
 
-let transportData = [];
+"use strict";
 
-// Google Sheet URL
-const TRANSPORT_URL = "";
+let transportData = null;
 
+// ======================================
 // Initialize
+// ======================================
+
 function initTransport() {
 
     loadTransport();
 
 }
 
-// Load Data
+// ======================================
+// Load
+// ======================================
+
 async function loadTransport() {
 
     try {
 
-        if (TRANSPORT_URL === "") {
-            console.log("Transport Sheet URL not set.");
-            return;
-        }
+        // TODO:
+        // Google Sheet / API နဲ့ချိတ်မယ်
 
-        transportData = await loadSheet(TRANSPORT_URL);
+        transportData = {
+
+            status: "Open",
+
+            message: "ရေကြောင်းသွားလာမှု ပုံမှန်ဖြစ်ပါသည်။",
+
+            updated: new Date()
+
+        };
 
         renderTransport();
 
-    } catch (error) {
+    }
 
-        console.error("Transport Error :", error);
+    catch (error) {
+
+        console.error(error);
 
     }
 
 }
 
+// ======================================
 // Render
+// ======================================
+
 function renderTransport() {
 
-    const box = document.getElementById("transportList");
+    const box = document.getElementById("transportInfo");
 
     if (!box) return;
 
-    box.innerHTML = "";
+    let color = "#22c55e";
 
-    transportData.forEach(item => {
+    if (transportData.status === "Warning") {
 
-        const card = document.createElement("div");
+        color = "#f59e0b";
 
-        card.className = "transport-card";
+    }
 
-        card.innerHTML = `
-            <h3>🚤 ${item.route}</h3>
+    if (transportData.status === "Closed") {
 
-            <p>📍 ${item.from} ➜ ${item.to}</p>
+        color = "#ef4444";
 
-            <p>🕒 ${item.departure}</p>
+    }
 
-            <p>💰 ${item.price}</p>
+    box.innerHTML = `
 
-            <p>📞 ${item.phone}</p>
+        <div class="transport-card">
 
-            <p>📢 ${item.status}</p>
-        `;
+            <h3>🚤 Water Transport</h3>
 
-        box.appendChild(card);
+            <p style="color:${color};">
 
-    });
+                <strong>${transportData.status}</strong>
+
+            </p>
+
+            <p>${transportData.message}</p>
+
+            <small>
+
+                Updated :
+
+                ${transportData.updated.toLocaleString()}
+
+            </small>
+
+        </div>
+
+    `;
 
 }

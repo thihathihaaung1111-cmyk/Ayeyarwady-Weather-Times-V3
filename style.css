@@ -201,15 +201,25 @@ color:var(--primary);
 
 #forecast{
 
-display:flex;
+    display:flex;
 
-gap:10px;
+    flex-direction:column;
 
-overflow-x:auto;
-
-padding-top:10px;
+    gap:10px;
 
 }
+
+.forecast-item{
+
+    background:#ffffff10;
+
+    padding:12px;
+
+    border-radius:10px;
+
+    border:1px solid rgba(255,255,255,.1);
+
+   }
 
 /* Footer */
 

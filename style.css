@@ -325,4 +325,20 @@ padding:8px;
 
 }
 
+/* Ai */
+
+#aiText{
+
+    line-height:1.8;
+
+    font-size:15px;
+
+}
+
+#aiText br{
+
+    margin-bottom:8px;
+
+}
+
    }

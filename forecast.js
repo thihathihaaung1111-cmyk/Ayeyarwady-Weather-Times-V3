@@ -1,45 +1,48 @@
 // ======================================
-// Ayeyarwady Weather Times V3
 // forecast.js
 // ======================================
 
 "use strict";
 
-
-// ======================================
-// Initialize Forecast
-// ======================================
+let forecastData = null;
 
 function initForecast() {
 
-    console.log("Forecast Module Ready");
+    if (APP.currentLocation) {
+
+        loadForecast();
+
+    }
 
 }
 
-
-// ======================================
-// Load Forecast
-// ======================================
-
 async function loadForecast() {
+
+    if (!APP.currentLocation) return;
 
     try {
 
-        if (!APP.currentLocation) {
+        const lat = APP.currentLocation.latitude;
+        const lon = APP.currentLocation.longitude;
 
-            return;
+        const url =
+`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto`;
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+
+            throw new Error("Forecast API Error");
 
         }
 
-        await getWeatherByLocation(
+        forecastData = await response.json();
 
-            APP.currentLocation.latitude,
+        renderForecast();
 
-            APP.currentLocation.longitude
+    }
 
-        );
-
-    } catch (error) {
+    catch (error) {
 
         console.error(error);
 
@@ -47,71 +50,31 @@ async function loadForecast() {
 
 }
 
+function renderForecast() {
 
-// ======================================
-// Render Forecast
-// ======================================
+    const box = document.getElementById("forecast");
 
-function renderForecast(data) {
+    if (!box || !forecastData) return;
 
-    updateForecast(data);
+    box.innerHTML = "";
 
-}
-
-
-// ======================================
-// Update Forecast
-// ======================================
-
-function updateForecast(data) {
-
-    const forecast = document.getElementById("forecast");
-
-    if (!forecast) return;
-
-    forecast.innerHTML = "";
-
-    const daily = data.daily;
+    const daily = forecastData.daily;
 
     for (let i = 0; i < daily.time.length; i++) {
 
-        const card = document.createElement("div");
+        const item = document.createElement("div");
 
-        card.className = "forecast-card";
+        item.className = "forecast-item";
 
-        const date = new Date(daily.time[i]);
-
-        const day = date.toLocaleDateString("en-US", {
-
-            weekday: "short"
-
-        });
-
-        card.innerHTML = `
-
-            <h4>${day}</h4>
-
-            <p>${daily.temperature_2m_max[i]}°</p>
-
-            <p>${daily.temperature_2m_min[i]}°</p>
-
-            <p>🌧 ${daily.precipitation_sum[i]} mm</p>
-
+        item.innerHTML = `
+            <div>${daily.time[i]}</div>
+            <div>${weatherCodeToText(daily.weather_code[i])}</div>
+            <div>${daily.temperature_2m_max[i]}° / ${daily.temperature_2m_min[i]}°</div>
+            <div>🌧 ${daily.precipitation_probability_max[i]}%</div>
         `;
 
-        forecast.appendChild(card);
+        box.appendChild(item);
 
     }
 
 }
-
-
-// ======================================
-// Refresh Forecast
-// ======================================
-
-async function refreshForecast() {
-
-    await loadForecast();
-
-        }

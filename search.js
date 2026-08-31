@@ -38,7 +38,7 @@ async function loadLocations() {
 
         const response = await fetch(
 
-            "data/locations.json"
+            "locations.json"
 
         );
 
